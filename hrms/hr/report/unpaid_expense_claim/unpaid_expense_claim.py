@@ -6,7 +6,13 @@ from collections import OrderedDict
 import frappe
 from frappe import _
 from frappe.query_builder.functions import Sum
-from frappe.utils import scrub
+
+
+GROUP_BY_FIELD_MAP = {
+	"Employee": "employee",
+	"Department": "department",
+	"Branch": "branch",
+}
 
 
 def execute(filters=None):
@@ -94,7 +100,10 @@ def get_columns():
 
 def build_grouped_result(data, filters):
 	group_by = filters.get("group_by")
-	group_key_field = scrub(group_by)
+	group_key_field = GROUP_BY_FIELD_MAP.get(group_by)
+
+	if not group_key_field:
+		return data
 
 	grouped = OrderedDict()
 	group_labels = OrderedDict()
